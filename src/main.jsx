@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
@@ -38,7 +38,33 @@ const faqs = [
 function App() {
   const [openFaq, setOpenFaq] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const heroArtRef = useRef(null);
+  const animationFrameRef = useRef(null);
+  useEffect(() => {
+    const items = document.querySelectorAll('[data-reveal]');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: .12 });
+    items.forEach((item) => observer.observe(item));
+    return () => observer.disconnect();
+  }, []);
+  const onHeroMove = (event) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - bounds.left) / bounds.width - .5) * 2;
+    const y = ((event.clientY - bounds.top) / bounds.height - .5) * 2;
+    cancelAnimationFrame(animationFrameRef.current);
+    animationFrameRef.current = requestAnimationFrame(() => {
+      heroArtRef.current?.style.setProperty('--tilt-x', x);
+      heroArtRef.current?.style.setProperty('--tilt-y', y);
+    });
+  };
   return <main>
+    <div className="reading-progress" aria-hidden="true"></div>
     <nav className="nav shell">
       <a className="brand" href="#top" aria-label="Bookore Systems home"><img src="/bookore-systems-logo.png" alt="Bookore Systems" /></a>
       <button className="menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Open navigation">{menuOpen ? '×' : '☰'}</button>
@@ -50,7 +76,8 @@ function App() {
       </div>
     </nav>
 
-    <section className="hero shell" id="top">
+    <section className="hero shell" id="top" onMouseMove={onHeroMove} onMouseLeave={() => { heroArtRef.current?.style.setProperty('--tilt-x', 0); heroArtRef.current?.style.setProperty('--tilt-y', 0); }}>
+      <div className="hero-stamp" aria-hidden="true"><span>BOOKORE / SYSTEMS</span><b>↗</b></div>
       <div className="eyebrow"><Spark /> AI OPERATIONS CONSULTANCY</div>
       <h1>Make the work<br /><em>work better.</em></h1>
       <p className="hero-copy">Bookore Systems helps growing teams eliminate repetitive work with practical AI systems, smarter workflows, and documentation that keeps everyone moving.</p>
@@ -58,8 +85,9 @@ function App() {
         <a className="button button-primary" href={calendlyUrl} target={calendlyUrl.startsWith('http') ? '_blank' : undefined} rel="noreferrer">Book a free AI operations audit <Arrow /></a>
         <a className="text-link" href="#approach">See how we work <Arrow /></a>
       </div>
-      <div className="hero-art" aria-hidden="true">
+      <div className="hero-art" ref={heroArtRef} aria-hidden="true">
         <div className="orb orb-one"></div><div className="orb orb-two"></div><div className="grid-plane"></div>
+        <div className="orbit-label orbit-label-one">LESS BUSYWORK</div><div className="orbit-label orbit-label-two">MORE MOMENTUM</div>
         <div className="automation-flow"><span className="flow-label">MANUAL WORK</span><div className="flow-track"><i></i><i></i><i></i></div><div className="flow-core"><Spark /></div><div className="flow-output"><span>AI SYSTEM</span><b>✓</b></div></div>
         <div className="system-card card-one"><span>Signal</span><strong>What is slowing us down?</strong><b>01</b></div>
         <div className="system-card card-two"><span>System</span><strong>Make the repeatable effortless.</strong><b>02</b></div>
@@ -68,10 +96,12 @@ function App() {
       <div className="scroll-note"><span></span>SCROLL TO EXPLORE</div>
     </section>
 
+    <div className="signal-band" aria-label="Bookore Systems works across your existing tools"><div className="signal-track"><span>CLARITY FOR THE WORK THAT MATTERS</span><i>✦</i><span>AI THAT FITS HOW YOU ALREADY WORK</span><i>✦</i><span>CLARITY FOR THE WORK THAT MATTERS</span><i>✦</i><span>AI THAT FITS HOW YOU ALREADY WORK</span></div></div>
+
     <section className="problem-section" id="approach">
       <div className="shell problem-grid">
-        <p className="section-kicker">THE REAL PROBLEM</p>
-        <div>
+        <p className="section-kicker" data-reveal>THE REAL PROBLEM</p>
+        <div data-reveal style={{ '--delay': '90ms' }}>
           <h2>Most businesses don’t have an AI problem.<br /><em>They have an operations problem.</em></h2>
           <p className="large-copy">Your team is busy, but too much of that work is repeatable: searching for answers, rebuilding documents, chasing follow-ups, and keeping disconnected tools in sync.</p>
           <p className="large-copy muted">AI should make work simpler—not create another system your team has to manage.</p>
@@ -80,27 +110,28 @@ function App() {
     </section>
 
     <section className="services shell" id="services">
-      <div className="section-head"><div><p className="section-kicker">WHAT WE DO</p><h2>Build the operating system<br /><em>behind your best work.</em></h2></div><p>We start with the friction your team feels every day and work backwards to a system that solves it.</p></div>
+      <div className="section-head" data-reveal><div><p className="section-kicker">WHAT WE DO</p><h2>Build the operating system<br /><em>behind your best work.</em></h2></div><p>We start with the friction your team feels every day and work backwards to a system that solves it.</p></div>
       <div className="service-list">
-        {services.map(service => <article className="service-card" key={service.number}>
+        {services.map((service, i) => <article className="service-card" data-reveal style={{ '--delay': `${i * 80}ms` }} key={service.number}>
           <span className="service-number">{service.number}</span><div><h3>{service.title}</h3><p>{service.text}</p></div><div className="outcome"><span>OUTCOME</span><strong>{service.outcome}</strong></div><span className="service-arrow"><Arrow /></span>
         </article>)}
       </div>
     </section>
 
     <section className="process-section">
-      <div className="shell"><div className="process-top"><p className="section-kicker">OUR PROCESS</p><h2>Clear steps.<br /><em>Useful outcomes.</em></h2></div>
+      <div className="shell"><div className="process-top" data-reveal><p className="section-kicker">OUR PROCESS</p><div><span className="process-caption">FROM FRICTION TO FLOW</span><h2>Clear steps.<br /><em>Useful outcomes.</em></h2></div></div>
       <div className="steps">
-        {['Discover','Design','Build','Train','Improve'].map((step, i) => <div className="step" key={step}><span>0{i + 1}</span><div className="step-dot"></div><strong>{step}</strong><p>{['Understand the work and find the friction.','Map a simpler system around your team.','Implement the right solution, not the shiniest tool.','Make it easy for your team to adopt.','Measure, refine, and keep moving forward.'][i]}</p></div>)}
+        {['Discover','Design','Build','Train','Improve'].map((step, i) => <div className="step" data-reveal style={{ '--delay': `${i * 100}ms` }} key={step}><span>0{i + 1}</span><div className="step-dot"></div><strong>{step}</strong><p>{['Understand the work and find the friction.','Map a simpler system around your team.','Implement the right solution, not the shiniest tool.','Make it easy for your team to adopt.','Measure, refine, and keep moving forward.'][i]}</p></div>)}
       </div></div>
     </section>
 
     <section className="audit shell" id="book">
-      <div className="audit-copy"><p className="section-kicker">YOUR FIRST STEP</p><h2>Start with an<br /><em>AI Operations Audit.</em></h2><p>In one focused session, we uncover the operational work getting in your team’s way—and show you where to start.</p><a className="button button-light" href={calendlyUrl} target={calendlyUrl.startsWith('http') ? '_blank' : undefined} rel="noreferrer">Book your free audit <Arrow /></a></div>
-      <div className="audit-panel"><div className="panel-title"><Spark /> YOUR AUDIT INCLUDES</div>{['30-minute discovery call','Workflow & opportunity review','AI Opportunity Score','Prioritized implementation roadmap','Personalized PDF report'].map((item, i) => <div className="audit-item" key={item}><span>0{i+1}</span>{item}<b>↗</b></div>)}<div className="audit-foot">Free for a limited number of early partners <span>●</span></div></div>
+      <div className="audit-glow" aria-hidden="true"></div>
+      <div className="audit-copy" data-reveal><p className="section-kicker">YOUR FIRST STEP</p><h2>Start with an<br /><em>AI Operations Audit.</em></h2><p>In one focused session, we uncover the operational work getting in your team’s way—and show you where to start.</p><a className="button button-light" href={calendlyUrl} target={calendlyUrl.startsWith('http') ? '_blank' : undefined} rel="noreferrer">Book your free audit <Arrow /></a></div>
+      <div className="audit-panel" data-reveal style={{ '--delay': '130ms' }}><div className="panel-title"><Spark /> YOUR AUDIT INCLUDES</div>{['30-minute discovery call','Workflow & opportunity review','AI Opportunity Score','Prioritized implementation roadmap','Personalized PDF report'].map((item, i) => <div className="audit-item" key={item}><span>0{i+1}</span>{item}<b>↗</b></div>)}<div className="audit-foot">Free for a limited number of early partners <span>●</span></div></div>
     </section>
 
-    <section className="faq shell" id="faq"><p className="section-kicker">FAQ</p><div className="faq-grid"><h2>Questions,<br /><em>answered.</em></h2><div>{faqs.map(([q,a], i) => <div className={'faq-item ' + (openFaq === i ? 'active' : '')} key={q}><button onClick={() => setOpenFaq(openFaq === i ? null : i)}>{q}<span>{openFaq === i ? '−' : '+'}</span></button>{openFaq === i && <p>{a}</p>}</div>)}</div></div></section>
+    <section className="faq shell" id="faq"><p className="section-kicker" data-reveal>FAQ</p><div className="faq-grid"><h2 data-reveal>Questions,<br /><em>answered.</em></h2><div>{faqs.map(([q,a], i) => <div className={'faq-item ' + (openFaq === i ? 'active' : '')} data-reveal style={{ '--delay': `${i * 75}ms` }} key={q}><button onClick={() => setOpenFaq(openFaq === i ? null : i)}>{q}<span>{openFaq === i ? '−' : '+'}</span></button>{openFaq === i && <p>{a}</p>}</div>)}</div></div></section>
 
     <footer><div className="shell footer-main"><a className="brand" href="#top" aria-label="Bookore Systems home"><img src="/bookore-systems-logo.png" alt="Bookore Systems" /></a><h2>Better systems.<br /><em>More momentum.</em></h2><a className="button button-primary" href={calendlyUrl} target={calendlyUrl.startsWith('http') ? '_blank' : undefined} rel="noreferrer">Book a free audit <Arrow /></a></div><div className="shell footer-bottom"><span>© {new Date().getFullYear()} Bookore Systems</span><a href="mailto:angela@bookoresystems.com">angela@bookoresystems.com</a><span>Built for better work.</span></div></footer>
   </main>

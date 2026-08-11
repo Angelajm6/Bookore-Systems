@@ -115,7 +115,7 @@ function App() {
     <section className="hero shell" id="top" onMouseMove={onHeroMove} onMouseLeave={() => { heroArtRef.current?.style.setProperty('--tilt-x', 0); heroArtRef.current?.style.setProperty('--tilt-y', 0); }}>
       <div className="hero-stamp" aria-hidden="true"><span>BOOKORE / SYSTEMS</span><b>↗</b></div>
       <div className="eyebrow"><Spark /> CONVERSION SYSTEMS FOR PREMIUM MEDSPAS</div>
-      <h1>Turn more inquiries into<br /><em>booked treatments.</em></h1>
+      <h1>Turn more<br />inquiries into<br /><em>booked treatments.</em></h1>
       <p className="hero-copy">Bookore builds the conversion and retention systems behind premium medspas—so fewer leads go cold, cancellations become recoverable revenue, and your front desk knows exactly where to focus.</p>
       <div className="hero-actions">
         <a className="button button-primary" href={calendlyUrl} target={calendlyUrl.startsWith('http') ? '_blank' : undefined} rel="noreferrer">Find your booking leaks <Arrow /></a>

@@ -112,7 +112,7 @@ function App() {
       </div>
     </nav>
 
-    <section className="hero shell" id="top" onMouseMove={onHeroMove} onMouseLeave={() => { heroArtRef.current?.style.setProperty('--tilt-x', 0); heroArtRef.current?.style.setProperty('--tilt-y', 0); }}>
+    <section className="hero" id="top" onMouseMove={onHeroMove} onMouseLeave={() => { heroArtRef.current?.style.setProperty('--tilt-x', 0); heroArtRef.current?.style.setProperty('--tilt-y', 0); }}>
       <div className="hero-stamp" aria-hidden="true"><span>BOOKORE / SYSTEMS</span><b>↗</b></div>
       <div className="eyebrow"><Spark /> CONVERSION SYSTEMS FOR PREMIUM MEDSPAS</div>
       <h1>Turn more<br />inquiries into<br /><em>booked treatments.</em></h1>

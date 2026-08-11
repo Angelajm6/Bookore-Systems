@@ -37,3 +37,7 @@
 
 /* Keep the hero message in its own text column at desktop widths. */
 @media (min-width:801px){.hero h1{max-width:650px;font-size:clamp(64px,6.4vw,92px);position:relative;z-index:3}.hero-art{right:-80px;width:500px}.hero-copy,.hero-actions{position:relative;z-index:3}}
+
+/* Full-bleed hero: aligned text, unconstrained artwork. */
+:root{--hero-gutter:max(32px,calc((100vw - 1160px)/2))}.hero{width:100%;max-width:none;margin:0;padding-left:var(--hero-gutter);padding-right:var(--hero-gutter);min-height:770px}.hero-art{right:calc(var(--hero-gutter) - 80px)}.hero-stamp{right:calc(var(--hero-gutter) + 8px)}.scroll-note{left:var(--hero-gutter)}
+@media(max-width:800px){.hero{padding-left:20px;padding-right:20px;min-height:720px}.hero-art{right:-150px}.hero-stamp{right:0}.scroll-note{left:20px}}

@@ -68,11 +68,75 @@ const systems = [
   }
 ];
 
+const liveDemos = [
+  {
+    id: 'consult',
+    label: 'Consult-to-Booked',
+    eyebrow: 'SYSTEM 01 / CONVERSION',
+    heading: <>A consult is too valuable<br /><em>to become a loose end.</em></>,
+    intro: 'Give a busy front desk one clear next step—while keeping a person in control of every client-facing action.',
+    profile: { tag: 'NEW INQUIRY', signal: 'HIGH INTENT', initials: 'MC', name: 'Maya Chen', source: 'New client · Instagram DM', details: [['INTEREST', 'Lip filler consultation'], ['INQUIRY RECEIVED', 'Today, 6:42 PM']] },
+    events: [['INQUIRY CAPTURED', 'Maya asked about availability and pricing.'], ['PRIORITY IDENTIFIED', 'New high-intent inquiry with no booking.']],
+    recommendation: 'Offer Maya a 15-minute consultation this week.',
+    supporting: 'Suggested message uses your approved tone and booking link.',
+    button: 'Approve & send message',
+    sentLabel: 'MESSAGE SENT',
+    sentCopy: '“Hi Maya—thanks for reaching out. I can help you find the right time for a consultation this week.”',
+    sentSupporting: 'The front desk can see the response and book directly from the conversation.',
+    sentButton: 'Simulate consultation booking',
+    outcome: 'Maya booked a consultation for Thursday at 4:00 PM.',
+    outcomeSupporting: 'The system records the result for your conversion view.',
+    metricLabel: 'high-intent inquiry',
+    bookedLabel: 'consultation booked'
+  },
+  {
+    id: 'recovery',
+    label: 'Cancellation Recovery',
+    eyebrow: 'SYSTEM 02 / CAPACITY',
+    heading: <>A cancelled slot can still<br /><em>be a booked treatment.</em></>,
+    intro: 'Turn a last-minute opening into a focused recovery task instead of hoping the front desk notices in time.',
+    profile: { tag: 'OPEN CAPACITY', signal: 'TIME SENSITIVE', initials: 'FR', name: 'Friday · 3:30 PM', source: '90-minute injectable appointment', details: [['CANCELLED', 'Today, 10:14 AM'], ['WINDOW', 'Within 72 hours']] },
+    events: [['OPEN SLOT DETECTED', 'A high-value appointment has been cancelled.'], ['BEST-FIT CLIENT FOUND', 'Nina is on the waitlist and matches this service window.']],
+    recommendation: 'Invite Nina to take Friday’s 3:30 PM appointment.',
+    supporting: 'The team sees an eligible client and approved message—not a list to manually search.',
+    button: 'Approve recovery outreach',
+    sentLabel: 'RECOVERY MESSAGE SENT',
+    sentCopy: '“Hi Nina—a Friday afternoon appointment just opened. Would you like me to hold it for you?”',
+    sentSupporting: 'Nina can confirm through your normal booking flow.',
+    sentButton: 'Simulate slot recovery',
+    outcome: 'Friday’s 3:30 PM appointment has been recovered.',
+    outcomeSupporting: 'The open capacity is now attributed to the recovery system.',
+    metricLabel: 'open high-value slot',
+    bookedLabel: 'appointment recovered'
+  },
+  {
+    id: 'retention',
+    label: 'Treatment Retention',
+    eyebrow: 'SYSTEM 03 / RETENTION',
+    heading: <>Returning clients deserve<br /><em>timely follow-through.</em></>,
+    intro: 'Give the front desk a provider-approved rebooking queue before a valuable client quietly drifts away.',
+    profile: { tag: 'REBOOKING DUE', signal: 'READY TO REVIEW', initials: 'EP', name: 'Elena Park', source: 'Returning client · 6 visits', details: [['LAST VISIT', '12 weeks ago'], ['APPROVED CADENCE', 'Review due this month']] },
+    events: [['CLIENT DUE IDENTIFIED', 'Elena is within the practice’s provider-approved follow-up window.'], ['OPPORTUNITY PRIORITIZED', 'Strong visit history with no future appointment on the books.']],
+    recommendation: 'Invite Elena to schedule her next treatment review.',
+    supporting: 'The queue uses practice-approved cadence rules—not clinical recommendations.',
+    button: 'Approve rebooking outreach',
+    sentLabel: 'REBOOKING MESSAGE SENT',
+    sentCopy: '“Hi Elena—we’d love to help you plan your next visit whenever the timing feels right.”',
+    sentSupporting: 'The outreach stays personal, approved, and easy for the team to track.',
+    sentButton: 'Simulate rebooking',
+    outcome: 'Elena has booked her next treatment review.',
+    outcomeSupporting: 'The return is measured as retained revenue—not just another sent text.',
+    metricLabel: 'rebooking opportunity',
+    bookedLabel: 'returning client booked'
+  }
+];
+
 function App() {
   const [openFaq, setOpenFaq] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSystem, setActiveSystem] = useState('consult');
-  const [consultDemoStep, setConsultDemoStep] = useState('review');
+  const [activeLiveDemo, setActiveLiveDemo] = useState('consult');
+  const [liveDemoStep, setLiveDemoStep] = useState('review');
   const heroArtRef = useRef(null);
   const animationFrameRef = useRef(null);
   useEffect(() => {
@@ -187,25 +251,15 @@ function App() {
 
     <section className="consult-demo-section" aria-labelledby="consult-demo-heading">
       <div className="shell">
-        <div className="consult-demo-head" data-reveal><div><p className="section-kicker">LIVE SYSTEM DEMO</p><h2 id="consult-demo-heading">A consult is too valuable<br /><em>to become a loose end.</em></h2></div><p>This is how the Consult-to-Booked System gives a busy front desk one clear next step—while keeping a person in control.</p></div>
-        <div className="consult-demo-grid">
-          <div className="lead-profile" data-reveal>
-            <div className="profile-head"><span>NEW INQUIRY</span><i>● HIGH INTENT</i></div>
-            <div className="profile-person"><div className="profile-avatar">MC</div><div><strong>Maya Chen</strong><span>New client · Instagram DM</span></div></div>
-            <div className="profile-detail"><span>INTEREST</span><strong>Lip filler consultation</strong></div>
-            <div className="profile-detail"><span>INQUIRY RECEIVED</span><strong>Today, 6:42 PM</strong></div>
-            <div className="profile-detail"><span>BOOKING STATUS</span><strong className={consultDemoStep === 'booked' ? 'status-booked' : ''}>{consultDemoStep === 'booked' ? 'Consultation booked' : 'Not yet booked'}</strong></div>
+        {liveDemos.filter((demo) => demo.id === activeLiveDemo).map((demo) => <React.Fragment key={demo.id}>
+          <div className="consult-demo-head" data-reveal><div><p className="section-kicker">LIVE SYSTEM DEMOS</p><h2 id="consult-demo-heading">{demo.heading}</h2></div><p>{demo.intro}</p></div>
+          <div className="live-demo-tabs" role="tablist" aria-label="Live system demos">{liveDemos.map((item, i) => <button key={item.id} role="tab" aria-selected={activeLiveDemo === item.id} className={activeLiveDemo === item.id ? 'active' : ''} onClick={() => { setActiveLiveDemo(item.id); setLiveDemoStep('review'); }}><span>0{i + 1}</span>{item.label}</button>)}</div>
+          <div className="consult-demo-grid">
+            <div className="lead-profile" data-reveal><div className="profile-head"><span>{demo.profile.tag}</span><i>● {demo.profile.signal}</i></div><div className="profile-person"><div className="profile-avatar">{demo.profile.initials}</div><div><strong>{demo.profile.name}</strong><span>{demo.profile.source}</span></div></div>{demo.profile.details.map(([label, value]) => <div className="profile-detail" key={label}><span>{label}</span><strong>{value}</strong></div>)}<div className="profile-detail"><span>STATUS</span><strong className={liveDemoStep === 'booked' ? 'status-booked' : ''}>{liveDemoStep === 'booked' ? 'Outcome recorded' : 'Needs team action'}</strong></div></div>
+            <div className="consult-workflow" data-reveal style={{ '--delay': '100ms' }}><div className="workflow-top"><span>BOOKORE / {demo.label.toUpperCase()}</span><b>DEMO DATA</b></div>{demo.events.map(([label, value], i) => <div className={'workflow-event ' + (liveDemoStep !== 'review' ? 'complete' : '')} key={label}><div className="workflow-icon">0{i + 1}</div><div><span>{label}</span><strong>{value}</strong></div><i>✓</i></div>)}{liveDemoStep === 'review' && <div className="workflow-action"><span>RECOMMENDED NEXT STEP</span><strong>{demo.recommendation}</strong><p>{demo.supporting}</p><button onClick={() => setLiveDemoStep('sent')}>{demo.button} <Arrow /></button></div>}{liveDemoStep === 'sent' && <div className="workflow-action sent"><span>{demo.sentLabel}</span><strong>{demo.sentCopy}</strong><p>{demo.sentSupporting}</p><button onClick={() => setLiveDemoStep('booked')}>{demo.sentButton} <Arrow /></button></div>}{liveDemoStep === 'booked' && <div className="workflow-action booked"><span>OUTCOME CAPTURED</span><strong>{demo.outcome}</strong><p>{demo.outcomeSupporting}</p><button onClick={() => setLiveDemoStep('review')}>Run the demo again <Arrow /></button></div>}</div>
+            <div className="consult-metrics" data-reveal style={{ '--delay': '180ms' }}><span>FRONT-DESK VIEW</span><div><b>{liveDemoStep === 'review' ? '1' : '0'}</b><strong>{demo.metricLabel}{liveDemoStep === 'review' ? '' : ' waiting'}</strong></div><div><b>{liveDemoStep === 'booked' ? '1' : '—'}</b><strong>{demo.bookedLabel}</strong></div><p>One prioritized action is more useful than another full inbox.</p></div>
           </div>
-          <div className="consult-workflow" data-reveal style={{ '--delay': '100ms' }}>
-            <div className="workflow-top"><span>BOOKORE / CONSULT-TO-BOOKED</span><b>DEMO DATA</b></div>
-            <div className={'workflow-event ' + (consultDemoStep !== 'review' ? 'complete' : '')}><div className="workflow-icon">01</div><div><span>INQUIRY CAPTURED</span><strong>Maya asked about availability and pricing.</strong></div><i>✓</i></div>
-            <div className={'workflow-event ' + (consultDemoStep !== 'review' ? 'complete' : '')}><div className="workflow-icon">02</div><div><span>PRIORITY IDENTIFIED</span><strong>New high-intent inquiry with no booking.</strong></div><i>✓</i></div>
-            {consultDemoStep === 'review' && <div className="workflow-action"><span>RECOMMENDED NEXT STEP</span><strong>Offer Maya a 15-minute consultation this week.</strong><p>Suggested message uses your approved tone and booking link.</p><button onClick={() => setConsultDemoStep('sent')}>Approve &amp; send message <Arrow /></button></div>}
-            {consultDemoStep === 'sent' && <div className="workflow-action sent"><span>MESSAGE SENT</span><strong>“Hi Maya—thanks for reaching out. I can help you find the right time for a consultation this week.”</strong><p>The front desk can see the response and book directly from the conversation.</p><button onClick={() => setConsultDemoStep('booked')}>Simulate consultation booking <Arrow /></button></div>}
-            {consultDemoStep === 'booked' && <div className="workflow-action booked"><span>OUTCOME CAPTURED</span><strong>Maya booked a consultation for Thursday at 4:00 PM.</strong><p>The lead is no longer a loose end. The system records the result for your conversion view.</p><button onClick={() => setConsultDemoStep('review')}>Run the demo again <Arrow /></button></div>}
-          </div>
-          <div className="consult-metrics" data-reveal style={{ '--delay': '180ms' }}><span>FRONT-DESK VIEW</span><div><b>{consultDemoStep === 'review' ? '1' : '0'}</b><strong>high-intent inquiry{consultDemoStep === 'review' ? '' : ' waiting'}</strong></div><div><b>{consultDemoStep === 'booked' ? '1' : '—'}</b><strong>consultation booked</strong></div><p>One prioritized action is more useful than another full inbox.</p></div>
-        </div>
+        </React.Fragment>)}
       </div>
     </section>
 

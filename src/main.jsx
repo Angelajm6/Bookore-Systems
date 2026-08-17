@@ -167,6 +167,12 @@ function App() {
     items.forEach((item) => observer.observe(item));
     return () => observer.disconnect();
   }, []);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      document.querySelectorAll('[data-reveal]').forEach((item) => item.classList.add('is-visible'));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [activeSystem, activeLiveDemo]);
   const onHeroMove = (event) => {
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - bounds.left) / bounds.width - .5) * 2;

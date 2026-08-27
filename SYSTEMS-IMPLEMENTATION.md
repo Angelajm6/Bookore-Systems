@@ -1,167 +1,65 @@
-# Bookore Systems — implementation blueprints
+# Bookore Systems — construction implementation blueprints
 
-These three systems are designed for premium, appointment-led medspas. They use operational data and provider-approved business rules; they do not make clinical recommendations.
+These systems support construction sales and operations. They use operational data and company-approved business rules; they do not price projects, approve scope, or make contract commitments.
 
-## Standard implementation stack
-
-| Layer | Recommended role | Start with |
+| Layer | Role | Start with |
 | --- | --- | --- |
-| Practice system | Booking, client record, availability, appointment status | Client's current booking platform or CRM |
-| Automation | Events, routing, retries, logs | n8n |
-| Review queue | Front-desk approval and accountability | Airtable or the client CRM |
-| Messaging | Approved SMS/email delivery | Existing platform, Podium, or Twilio |
-| Intelligence | Classification and approved draft creation | OpenAI API with structured outputs |
+| Source systems | Lead, estimate, contract, project events | Existing CRM, estimating tool, or controlled export |
+| Automation | Routing, reminders, retries, logging | n8n |
+| Review queue | Approval and accountability | Notion CRM or client CRM |
+| Messaging | Approved outreach | Existing email/SMS tool |
+| Reporting | Pipeline and handoff outcomes | CRM view or spreadsheet |
 
-Every system follows the same rule: **AI can prioritize and draft; the team approves client-facing action.**
+**Operating rule:** AI can classify and draft from approved templates; the team approves client-facing action and all commercial decisions.
 
-## 01 — Consult-to-Booked
+## 01 — Lead-to-Site-Visit
 
-**Business outcome:** More qualified consultations booked.
-
-### Trigger
-
-- New inquiry enters from website, Instagram, call/text platform, referral form, or booking request.
-- Or: an inquiry remains unbooked after the practice-defined response window.
-
-### Workflow
+**Trigger:** New inquiry from a web form, referral, call, inbox, or lead source; or an inquiry remains unanswered after the company response target.
 
 ```text
-New inquiry → normalize source and service interest → identify approved priority signals
-→ create a front-desk action → draft approved response → human review
-→ send through existing channel → booking confirmed or intentionally marked lost
+New lead → normalize project type, location, budget/timing signals
+→ apply fit and duplicate rules → create sales action → human review
+→ approved outreach → site visit scheduled or disposition recorded
 ```
 
-### Approval queue fields
+**Queue fields:** lead, source, project type, service area, timing, fit reason, last action, suggested action/draft, owner, due date, site-visit status, outcome.
 
-- Inquiry ID and source
-- Name / preferred channel
-- Service interest captured from the inquiry
-- Arrival time and last team action
-- Booking status
-- Priority reason
-- Recommended action
-- Draft message
-- Assigned owner
-- Outcome: booked / not now / lost / needs provider review
+**Scorecard:** response time, qualified leads, site visits, conversion by source, follow-up completion, loss reasons.
 
-### Recordable demo path
+## 02 — Estimate Follow-Up
 
-1. Maya’s Instagram inquiry arrives.
-2. The system recognizes a new, unbooked, high-intent consultation request.
-3. A staff member reviews one suggested response.
-4. The message is approved and sent.
-5. The consultation is booked and attribution is recorded.
-
-### Scorecard
-
-- Median time to first meaningful response
-- Inquiry-to-consultation booking rate
-- Follow-up completion rate
-- Booked consultations attributable to the system
-- Lost reason distribution
-
-## 02 — Cancellation Recovery
-
-**Business outcome:** More recovered capacity and fewer expensive open slots.
-
-### Trigger
-
-- An appointment is cancelled or rescheduled.
-- An opening appears inside the practice’s defined recovery window.
-
-### Workflow
+**Trigger:** Estimate sent with no next step after the company-defined follow-up window.
 
 ```text
-Cancellation event → validate open slot and service constraints → select eligible waitlist / overdue clients
-→ rank candidates by practice-approved rules → create a recovery action → human review
-→ send approved outreach → slot booked or expiry recorded
+Estimate event → validate active status and amount → evaluate age and next-step date
+→ create prioritized sales action → human review → approved outreach
+→ proposal is won, lost, deferred, or remains active
 ```
 
-### Candidate rules
+**Queue fields:** estimate number, client/project, value, sent date, expiry date, last contact, next action, priority reason, owner, draft, outcome, win/loss reason.
 
-- Client has opted in to communication.
-- Requested or eligible service matches the appointment slot.
-- Provider, location, and time window are compatible.
-- Exclude clients with an unresolved account, active complaint, or a practice-defined exclusion flag.
+**Scorecard:** active estimate value, aging, first-follow-up time, follow-up completion, win rate, won value, win/loss reasons.
 
-### Approval queue fields
+## 03 — Project Handoff
 
-- Cancelled appointment and open slot
-- Service, provider, location, duration
-- Best-fit candidate(s)
-- Reason each candidate is eligible
-- Outreach draft
-- Owner and expiry time
-- Outcome: recovered / declined / no response / slot released
-
-### Recordable demo path
-
-1. A Friday 3:30 PM injectable appointment cancels.
-2. The system matches Nina from the waitlist.
-3. The front desk reviews the prepared outreach.
-4. Nina accepts and the appointment is recovered.
-5. The recovered appointment is attributed to the system.
-
-### Scorecard
-
-- Eligible cancelled-slot value
-- Recovery outreach completion rate
-- Recovered appointment rate
-- Recovered revenue
-- Time from cancellation to first recovery action
-
-## 03 — Treatment Retention
-
-**Business outcome:** More returning clients and repeat revenue.
-
-### Trigger
-
-- A client reaches a provider-approved follow-up or treatment cadence window.
-- A client has no future booking and meets the practice’s re-engagement criteria.
-
-### Workflow
+**Trigger:** Contract signed, deposit received, or estimate marked won.
 
 ```text
-Daily cadence review → apply provider-approved timing and eligibility rules → exclude future-booked clients
-→ create a prioritized rebooking queue → human review → approved outreach
-→ booking recorded or a no-contact / defer outcome applied
+Sold-job event → create handoff record → link contract, scope, allowance, and documents
+→ assign production owner and due dates → identify incomplete items
+→ sales/production review → project is production-ready or escalated
 ```
 
-### Approval queue fields
+**Queue fields:** project/client, contract value, sold date, signed scope, documents, allowances/selections, open decisions, project manager, kickoff date, checklist status, exception reason.
 
-- Client ID
-- Last visit date and service category
-- Provider-approved cadence window
-- Future booking status
-- Communication consent
-- Priority reason
-- Suggested approved outreach
-- Owner and next-review date
-- Outcome: booked / deferred / declined / do not contact
+**Scorecard:** sold-to-ready time, complete handoffs, unresolved decisions, kickoff delays, rework/surprise reasons.
 
-### Recordable demo path
+## Launch checklist
 
-1. Elena reaches a practice-approved review window.
-2. She has strong history but no future booking.
-3. The system creates a focused action for the front desk.
-4. A staff member approves the outreach.
-5. Elena books, and the return is tracked as retained revenue.
-
-### Scorecard
-
-- Eligible clients due for follow-up
-- Follow-up completion rate
-- Returning-client booking rate
-- Retained revenue
-- Client communication opt-out rate
-
-## Shared safety and launch checklist
-
-- [ ] Confirm client communication consent and channel-specific rules.
-- [ ] Define exactly which fields are operationally necessary.
-- [ ] Obtain the appropriate privacy, access, and vendor agreements before handling protected health information.
-- [ ] Document provider-approved cadences and exclusions.
-- [ ] Test with fictional data before connecting client records.
-- [ ] Require human approval for every initial client-facing message.
-- [ ] Set a retry policy, owner, and escalation path for every failed workflow.
-- [ ] Review results with the client after the first two weeks and refine the rules.
+- [ ] Confirm data owner and permitted access for every source.
+- [ ] Define fit, qualification, estimate, and handoff rules with sales and operations.
+- [ ] Prepare approved message templates and escalation language.
+- [ ] Test with fictional lead, estimate, and sold-job records.
+- [ ] Require approval for every pilot message.
+- [ ] Set an accountable owner and exception path for every action.
+- [ ] Review results after two weeks and tune the rules.

@@ -16,7 +16,7 @@ export default function About() {
     <section className="page-hero shell">
       <Kicker spark>ABOUT</Kicker>
       <h1><span className="line"><span>A small team that builds</span></span><span className="line"><span><em>what it recommends.</em></span></span></h1>
-      <p className="hero-copy">Bookore Systems is run by Angela Jaume. We started building revenue systems for contractors and medspas, and kept finding the same shape underneath: a business that outgrew its manual follow-through. Now we build that layer for any owner-led service business.</p>
+      <p className="hero-copy">Bookore Systems started by building revenue systems for contractors and medspas, and kept finding the same shape underneath: a business that outgrew its manual follow-through. Now we build that layer for any owner-led service business, and we build what we recommend.</p>
       <div className="hero-actions"><BookButton /></div>
     </section>
 

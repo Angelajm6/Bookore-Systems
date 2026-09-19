@@ -40,10 +40,10 @@ export function useReveal() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+        if (entry.isIntersecting) { entry.target.setAttribute('data-reveal', 'done'); observer.unobserve(entry.target); }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-    const arm = () => document.querySelectorAll('[data-reveal]:not(.is-visible)').forEach((el) => reduce ? el.classList.add('is-visible') : observer.observe(el));
+    const arm = () => document.querySelectorAll('[data-reveal]:not([data-reveal="done"])').forEach((el) => reduce ? el.setAttribute('data-reveal', 'done') : observer.observe(el));
     arm();
     const mo = new MutationObserver(arm);
     mo.observe(document.body, { childList: true, subtree: true });
